@@ -1,0 +1,211 @@
+/* ============================================================
+   PlexCode — Landing Page Styles
+   ============================================================ */
+
+#landing-page {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 500;
+}
+
+/* Background grid */
+.landing-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+}
+
+.landing-glow {
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34,197,94,0.07) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: pulseGlow 4s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.06); }
+}
+
+/* Floating code particles */
+.code-particle {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  pointer-events: none;
+  animation: floatUp linear infinite;
+  opacity: 0;
+  white-space: nowrap;
+}
+
+@keyframes floatUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  10% { opacity: 0.4; }
+  90% { opacity: 0.2; }
+  100% { opacity: 0; transform: translateY(-60px); }
+}
+
+/* Main card */
+.landing-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 380px;
+  padding: var(--sp-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  animation: cardReveal 0.6s var(--ease) forwards;
+}
+
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.landing-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.landing-logo {
+  font-family: var(--font-logo);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  display: inline-flex;
+  align-items: center;
+}
+.landing-logo .l-bracket { color: var(--text-tertiary); }
+.landing-logo .l-p { color: var(--accent); }
+.landing-logo .l-dot { color: var(--accent); font-size: 32px; line-height: 1; }
+.landing-logo .l-close { color: var(--text-tertiary); }
+
+.landing-tagline {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.2px;
+}
+
+/* View switching */
+.landing-views { position: relative; }
+
+.landing-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  animation: viewIn 0.25s var(--ease);
+}
+.landing-view.hidden { display: none; }
+
+@keyframes viewIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Google button */
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: 11px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--text-primary);
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: background var(--t-fast), border-color var(--t-fast), box-shadow var(--t-fast);
+  cursor: pointer;
+}
+.btn-google:hover {
+  background: var(--bg-hover);
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: var(--shadow-sm);
+}
+.btn-google svg { width: 18px; height: 18px; }
+
+/* Wider buttons for landing */
+.landing-view .btn {
+  width: 100%;
+  padding: 11px;
+  font-size: 13.5px;
+}
+
+/* Auth form links */
+.auth-link-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.auth-link {
+  color: var(--accent);
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity var(--t-fast);
+}
+.auth-link:hover { opacity: 0.8; }
+
+/* Guest mode button */
+.btn-guest {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  width: 100%;
+  padding: 9px;
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: color var(--t-fast);
+  border-radius: var(--r-md);
+}
+.btn-guest:hover { color: var(--text-secondary); background: var(--bg-elevated); }
+
+/* Auth form error box */
+.auth-error {
+  background: rgba(248,113,113,0.08);
+  border: 1px solid rgba(248,113,113,0.2);
+  border-radius: var(--r-md);
+  padding: 10px 12px;
+  font-size: 12.5px;
+  color: var(--text-danger);
+  display: none;
+}
+.auth-error.show { display: block; }
+
+/* Loading state on button */
+.btn .btn-spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(0,0,0,0.2);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+}
+.btn-primary .btn-spinner { border-color: rgba(0,0,0,0.2); border-top-color: #000; }
