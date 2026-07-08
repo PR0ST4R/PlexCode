@@ -87,7 +87,7 @@ export function createEditor(containerId, theme = 'dark') {
     fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
     fontLigatures: true,
     lineNumbers: 'on',
-    minimap: { enabled: true, scale: 1 },
+    minimap: { enabled: false, scale: 1 },
     scrollBeyondLastLine: false,
     automaticLayout: true,
     tabSize: 2,
