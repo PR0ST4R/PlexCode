@@ -4,7 +4,7 @@
  */
 
 import supabase from './supabase.js';
-import { initAuth, showLandingView, enterGuestMode } from './auth/auth.js';
+import { initAuth, showLandingView, enterGuestMode, handleProstarCallback } from './auth/auth.js';
 import { loadProfile, renderSidebarUser, renderSettingsProfile, initProfileUI } from './auth/profile.js';
 import { loadMonaco, createEditor, openFile as editorOpenFile, getContent, setTheme as editorSetTheme, onContentChange, onCursorChange, undo, redo, openSearch, getEditorStats } from './editor/monaco.js';
 import { openTab, closeTab, getActiveTab, setActiveTab, onTabSwitch, onTabClose, markDirty, updateTabContent, renameTab, setTabDbId, getAllTabs } from './editor/tabs.js';
@@ -30,9 +30,59 @@ const state = {
   autosaveTimer: null,
 };
 
+
+// ─── Prostar Callback Page ────────────────────────────────────────────────────
+
+async function handleProstarCallbackPage() {
+  document.body.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0d0d0f;font-family:Inter,sans-serif;color:#f0f0f2;flex-direction:column;gap:20px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:#22c55e">&lt;p.&gt;</div>
+      <div id="cb-status" style="font-size:14px;color:#8b8b9a">Completing sign in with Prostar…</div>
+      <div id="cb-spinner" style="width:32px;height:32px;border:3px solid rgba(255,255,255,0.06);border-top-color:#22c55e;border-radius:50%;animation:spin 0.7s linear infinite"></div>
+      <div id="cb-error" style="display:none;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:8px;padding:12px 20px;font-size:13px;color:#f87171;max-width:360px;text-align:center"></div>
+      <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    </div>`;
+
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  const state = params.get('state');
+  const error = params.get('error');
+
+  const setStatus = (msg) => {
+    const el = document.getElementById('cb-status');
+    if (el) el.textContent = msg;
+  };
+  const setError = (msg) => {
+    const errEl = document.getElementById('cb-error');
+    const spinner = document.getElementById('cb-spinner');
+    if (errEl) { errEl.textContent = msg + ' Redirecting back…'; errEl.style.display = 'block'; }
+    if (spinner) spinner.style.display = 'none';
+    setTimeout(() => { window.location.href = '/'; }, 4000);
+  };
+
+  if (error) { setError(`Prostar error: ${error}.`); return; }
+  if (!code || !state) { setError('Missing code or state.'); return; }
+
+  setStatus('Verifying with Prostar…');
+  const result = await handleProstarCallback(code, state);
+
+  if (result.ok) {
+    setStatus('Signed in! Redirecting…');
+    window.location.href = '/';
+  } else {
+    setError(result.error || 'Something went wrong.');
+  }
+}
+
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 
 async function boot() {
+  // ── Prostar callback handler ──────────────────────────────────────────────
+  if (window.location.pathname === '/prostar-callback') {
+    await handleProstarCallbackPage();
+    return;
+  }
+
   initAuth();
   bindGlobalUI();
 

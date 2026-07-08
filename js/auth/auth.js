@@ -13,7 +13,7 @@ const PROSTAR = {
   clientSecret: 'e2108e3521fccafd5b98d531d30d55447058f61b46bf2f042c804a56d90183f5',
   authorizeUrl: 'https://prostar-acc.vercel.app/oauth/authorize.html',
   tokenUrl: 'https://agechujhqhbmuenncwtb.supabase.co/functions/v1/prostar-token',
-  redirectUri: 'https://plex-code.vercel.app/prostar-callback.html',
+  redirectUri: 'https://plex-code.vercel.app/prostar-callback',
 };
 
 // ─── View switching ───────────────────────────────────────────────────────────
