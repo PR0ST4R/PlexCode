@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlexCode — Signing in with Prostar…</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@600&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0d0d0f;
+      color: #f0f0f2;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      text-align: center;
+      padding: 48px 40px;
+      background: #18181d;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      max-width: 360px;
+      width: 90%;
+    }
+
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -1px;
+    }
+    .logo .p { color: #22c55e; }
+    .logo .dim { color: #333340; }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid rgba(255,255,255,0.06);
+      border-top-color: #22c55e;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .status {
+      font-size: 14px;
+      color: #8b8b9a;
+      line-height: 1.6;
+    }
+
+    .error-box {
+      display: none;
+      background: rgba(248,113,113,0.08);
+      border: 1px solid rgba(248,113,113,0.2);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #f87171;
+      width: 100%;
+    }
+    .error-box.show { display: block; }
+
+    .btn-back {
+      display: none;
+      padding: 9px 20px;
+      background: #18181d;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      color: #f0f0f2;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .btn-back:hover { background: #22222a; }
+    .btn-back.show { display: block; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo"><span class="dim">&lt;</span><span class="p">p.</span><span class="dim">&gt;</span></div>
+    <div class="spinner" id="spinner"></div>
+    <p class="status" id="status">Completing sign in with Prostar…</p>
+    <div class="error-box" id="error-box"></div>
+    <button class="btn-back" id="btn-back" onclick="window.location.href='/'">← Back to PlexCode</button>
+  </div>
+
+  <script type="module">
+    import { handleProstarCallback } from './js/auth/auth.js';
+
+    async function run() {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      const state = params.get('state');
+      const error = params.get('error');
+
+      const statusEl = document.getElementById('status');
+      const errorBox = document.getElementById('error-box');
+      const spinner = document.getElementById('spinner');
+      const btnBack = document.getElementById('btn-back');
+
+      // Prostar returned an error
+      if (error) {
+        spinner.style.display = 'none';
+        errorBox.textContent = `Prostar error: ${error}`;
+        errorBox.classList.add('show');
+        btnBack.classList.add('show');
+        return;
+      }
+
+      if (!code || !state) {
+        spinner.style.display = 'none';
+        errorBox.textContent = 'Missing code or state. Please try signing in again.';
+        errorBox.classList.add('show');
+        btnBack.classList.add('show');
+        return;
+      }
+
+      statusEl.textContent = 'Verifying with Prostar…';
+
+      const result = await handleProstarCallback(code, state);
+
+      if (result.ok) {
+        statusEl.textContent = 'Signed in! Redirecting…';
+        window.location.href = '/';
+      } else {
+        spinner.style.display = 'none';
+        statusEl.textContent = 'Sign in failed.';
+        errorBox.textContent = result.error || 'Something went wrong. Please try again.';
+        errorBox.classList.add('show');
+        btnBack.classList.add('show');
+      }
+    }
+
+    run().catch((e) => {
+      document.getElementById('spinner').style.display = 'none';
+      document.getElementById('status').textContent = 'Unexpected error.';
+      const box = document.getElementById('error-box');
+      box.textContent = e.message;
+      box.classList.add('show');
+      document.getElementById('btn-back').classList.add('show');
+    });
+  </script>
+</body>
+</html>

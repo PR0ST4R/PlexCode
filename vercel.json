@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/prostar-callback.html", "destination": "/prostar-callback.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
